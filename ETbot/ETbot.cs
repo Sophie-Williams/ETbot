@@ -64,16 +64,16 @@ namespace ETbot {
                             };
                             follow.Write(writer);
                         }
-                        if (entityUpdate.modeTimer < 25) {
+                        if (entityUpdate.modeTimer < 50) {
                             var shoot = new Shoot() {
                                 attacker = personalGuid,
                                 chunkX = (int)players[personalGuid].position.x / 0x1000000,
                                 chunkY = (int)players[personalGuid].position.y / 0x1000000,
                                 position = players[personalGuid].position,
-                                particles = 100,
-                                mana = 100,
+                                particles = 1f,
+                                mana = 1f,
                                 scale = 1f,
-                                projectile = 2,
+                                projectile = 0,
                             };
                             shoot.position.x = players[maloxGuid].position.x + (long)(players[maloxGuid].rayHit.x * 0x10000);
                             shoot.position.y = players[maloxGuid].position.y + (long)(players[maloxGuid].rayHit.y * 0x10000);

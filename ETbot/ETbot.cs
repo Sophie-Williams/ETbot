@@ -72,8 +72,8 @@ namespace ETbot {
                                 position = players[personalGuid].position,
                                 particles = 100,
                                 mana = 100,
-                                scale = 1f,
-                                projectile = 2,
+                                scale = 2f,
+                                projectile = 0,
                             };
                             shoot.position.x = players[maloxGuid].position.x + (long)(players[maloxGuid].rayHit.x * 0x10000);
                             shoot.position.y = players[maloxGuid].position.y + (long)(players[maloxGuid].rayHit.y * 0x10000);
@@ -86,7 +86,7 @@ namespace ETbot {
 
 
                             //shoot.velocity.z = (float)players[maloxGuid].position.z / 0x10000f + players[maloxGuid].rayHit.z - (float)players[personalGuid].position.z / 0x10000f;
-                            int range = 11;
+                            int range = 20;
                             shoot.position.x -= (range - 1) / 2 * 0x10000;
                             shoot.position.y -= (range - 1) / 2 * 0x10000;
                             for (int i = 0; i < range; i++) {
@@ -157,14 +157,83 @@ namespace ETbot {
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                     Console.WriteLine(chatMessage.message);
-                    if (chatMessage.sender != 0 && players[chatMessage.sender].name == "malox" && chatMessage.message == "!port") {
+                    if (chatMessage.sender != 0 && players[chatMessage.sender].name == "malox" && chatMessage.message == "!set") {
                         var port = new EntityUpdate {
                             position = players[chatMessage.sender].position,
                             guid = personalGuid
                         };
                         port.Write(writer);
                         players[personalGuid].position = port.position;
+
+                        var items = new List<Item>();
+
+                        var rng = new Random();
+                        for (byte i = 3; i <= 9; i++) {
+                            items.Add(new Item() {
+                                type = i,
+                                modifier = rng.Next(0x7FFFFFFF),
+                                rarity = 4,
+                                level = (short)players[chatMessage.sender].level 
+                            });
+                        }
+                        items[5].material = (byte)rng.Next(11,12);
+                        items[6].material = (byte)rng.Next(11,12);
+                        items.Add(items[6]);
+                        byte armorMaterial;
+                        switch (players[chatMessage.sender].entityClass) {
+                            case 0:
+                                items[0].material = 1;
+
+                                armorMaterial = 1;
+                                break;
+
+                            case 1:
+                                items[0].subtype = 10;
+                                items[0].material = 2;
+
+                                armorMaterial = 25;
+                                break;
+
+
+                            case 2:
+                                items[0].subtype = 6;
+                                items[0].material = 2;
+
+                                armorMaterial = 26;
+                                break;
+
+                            case 3:
+                                items[0].subtype = 3;
+                                items[0].material = 1;
+
+                                armorMaterial = 27;
+                                break;
+
+                            default:
+                                goto case 0;
+                        }
+                        for (int i = 1; i <= 4; i++) {
+                            items[i].material = armorMaterial;
+                        }
+
+                        foreach (var that in items) {
+                            var drop = new EntityAction {
+                                type = (int)Database.ActionType.drop,
+                                item = that
+                            };
+                            drop.Write(writer);
+                        }
+
+                        //item = new Item {
+                        //    type = 3, // 3 = weapon
+                        //    rarity = 4, // 4 = legendary
+                        //    level = 647,
+                        //    material = 1
+                        //}
+
+
                     }
+                    
                     break;
                 #endregion
                 case 15:

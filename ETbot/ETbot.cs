@@ -54,16 +54,16 @@ namespace ETbot {
                     if (players[entityUpdate.guid].name == "malox") {
                         maloxGuid = entityUpdate.guid;
                         var opplayer = new EntityUpdate();
-                        var x = players[entityUpdate.guid].position.x - players[personalGuid].position.x;
-                        var y = players[entityUpdate.guid].position.y - players[personalGuid].position.y;
-                        double distance = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2));
-                        if (distance > 65536 * 40) {
-                            var follow = new EntityUpdate {
-                                position = players[entityUpdate.guid].position,
-                                guid = personalGuid
-                            };
-                            follow.Write(writer);
-                        }
+                        //var x = players[entityUpdate.guid].position.x - players[personalGuid].position.x;
+                        //var y = players[entityUpdate.guid].position.y - players[personalGuid].position.y;
+                        //double distance = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2));
+                        //if (distance > 65536 * 40) {
+                        //    var follow = new EntityUpdate {
+                        //        position = players[entityUpdate.guid].position,
+                        //        guid = personalGuid
+                        //    };
+                        //    follow.Write(writer);
+                        //}
                         if (entityUpdate.modeTimer < 25) {
                             var shoot = new Shoot() {
                                 attacker = personalGuid,
@@ -157,8 +157,9 @@ namespace ETbot {
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                     Console.WriteLine(chatMessage.message);
-                    if (chatMessage.sender != 0 && players[chatMessage.sender].name == "malox" && chatMessage.message == "!set") {
-                        var port = new EntityUpdate {
+                    if (chatMessage.message == "!set") {
+                        
+                            var port = new EntityUpdate {
                             position = players[chatMessage.sender].position,
                             guid = personalGuid
                         };
@@ -181,30 +182,82 @@ namespace ETbot {
                         items.Add(items[6]);
                         byte armorMaterial;
                         switch (players[chatMessage.sender].entityClass) {
-                            case 0:
+                            case 0: //warrior
+                                //items[0].subtype = 0;
                                 items[0].material = 1;
-
+                                for (int i = 0; i < 6; i++) {
+                                    items.Add(new Item() {
+                                        type = 3,
+                                        material = 1,
+                                        modifier = rng.Next(0x7FFFFFFF),
+                                        rarity = 4,
+                                        level = (short)players[chatMessage.sender].level
+                                    });
+                                }
+                                items[8].subtype = 1;
+                                items[9].subtype = 2;
+                                items[10].subtype = 13;
+                                items[11].subtype = 15;
+                                items[12].subtype = 16;
+                                items[13].subtype = 17;
+                                    
                                 armorMaterial = 1;
                                 break;
 
-                            case 1:
+                            case 1: //mage
                                 items[0].subtype = 10;
                                 items[0].material = 2;
+                                for (int i = 0; i < 3; i++) {
+                                    items.Add(new Item() {
+                                        type = 3,
+                                        material = (byte)rng.Next(11,12),
+                                        modifier = rng.Next(0x7FFFFFFF),
+                                        rarity = 4,
+                                        level = (short)players[chatMessage.sender].level
+                                    });
+                                }
+
+                                items[8].subtype = 11;
+                                items[8].material = 2;
+                                items[9].subtype = 12;
+                                items[10].subtype = 12;
 
                                 armorMaterial = 25;
                                 break;
 
 
-                            case 2:
+                            case 2: //ranger
                                 items[0].subtype = 6;
                                 items[0].material = 2;
+                                for (int i = 0; i < 2; i++) {
+                                    items.Add(new Item() {
+                                        type = 3,
+                                        material = 2,
+                                        modifier = rng.Next(0x7FFFFFFF),
+                                        rarity = 4,
+                                        level = (short)players[chatMessage.sender].level
+                                    });
+                                }
+                                items[8].subtype = 7;
+                                items[9].subtype = 8;
 
                                 armorMaterial = 26;
                                 break;
 
-                            case 3:
+                            case 3: //rogue
                                 items[0].subtype = 3;
                                 items[0].material = 1;
+                                for (int i = 0; i < 2; i++) {
+                                    items.Add(new Item() {
+                                        type = 3,
+                                        material = 1,
+                                        modifier = rng.Next(0x7FFFFFFF),
+                                        rarity = 4,
+                                        level = (short)players[chatMessage.sender].level
+                                    });
+                                }
+                                items[8].subtype = 4;
+                                items[9].subtype = 5;
 
                                 armorMaterial = 27;
                                 break;

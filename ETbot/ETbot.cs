@@ -104,7 +104,9 @@ namespace ETbot {
                 #endregion
                 case 2:
                     #region complete
-                    //empty
+                    new EntityUpdate() {
+                        lastHitTime = (int)stopWatch.ElapsedMilliseconds
+                    }.Write(writer);
                     break;
                 #endregion
                 case 4:
@@ -120,7 +122,6 @@ namespace ETbot {
 
 
                             life.Write(writer);
-                            AntiTimeOut(new EntityUpdate());
                             if (players[personalGuid].HP <= 0) {
                                 life.HP = 1623f;
                                 life.Write(writer);
@@ -157,9 +158,9 @@ namespace ETbot {
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                     Console.WriteLine(chatMessage.message);
-                    if (chatMessage.message == "!set") {
+                    if (chatMessage.message == "!give_me_items") {
                         
-                            var port = new EntityUpdate {
+                        var port = new EntityUpdate {
                             position = players[chatMessage.sender].position,
                             guid = personalGuid
                         };
@@ -285,6 +286,13 @@ namespace ETbot {
                         //}
 
 
+                    }
+                    else if (chatMessage.message == "!come_here") {
+                        var port = new EntityUpdate {
+                            position = players[chatMessage.sender].position,
+                            guid = personalGuid
+                        };
+                        port.Write(writer);
                     }
                     
                     break;
@@ -427,12 +435,6 @@ namespace ETbot {
                     break;
 
             }
-        }
-
-        static void AntiTimeOut(EntityUpdate packet) {
-            packet.lastHitTime = (int)stopWatch.ElapsedMilliseconds;
-            packet.Write(writer);
-            //Task.Delay(100).ContinueWith(t => AntiTimeOut(packet));
         }
     }   
 }

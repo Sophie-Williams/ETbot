@@ -1,19 +1,10 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace ETbot {
     class Program {
         static void Main(string[] args) {
             while (true) {
-                try {
-                    ETbot.Connect("foxdev.co", 12345);
-                }
-                catch (EndOfStreamException) {
-
-                }
+                ETbot.Connect("foxdev.co", 12345);
             }
         }
     }

@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using Resources;
 using Resources.Packet;
 using Resources.Utilities;
 using Resources.Packet.Part;
-using System.Threading;
 using System.Diagnostics;
 
 namespace ETbot {
@@ -21,22 +19,25 @@ namespace ETbot {
         static long maloxGuid;
 
         public static void Connect(string hostname, int port) {
+            stopWatch.Reset();
             players = new Dictionary<long, EntityUpdate>();
             connection = new TcpClient(hostname, port);
             var thatStream = connection.GetStream();
             reader = new BinaryReader(thatStream);
             writer = new BinaryWriter(thatStream);
 
-            var zumServerhallosagen = new ProtocolVersion {
+            new ProtocolVersion {
                 version = 3,
-            };
-            zumServerhallosagen.Write(writer);
+            }.Write(writer);
 
-            
-
-            while (true) {
-                var packetid = reader.ReadInt32();
-                ProcessPacket(packetid);
+            try {
+                while (true) {
+                    var packetid = reader.ReadInt32();
+                    ProcessPacket(packetid);
+                }
+            }
+            catch (EndOfStreamException) {
+                connection.Close();
             }
         }
 
@@ -53,7 +54,6 @@ namespace ETbot {
                     }
                     if (players[entityUpdate.guid].name == "malox") {
                         maloxGuid = entityUpdate.guid;
-                        var opplayer = new EntityUpdate();
                         var x = players[entityUpdate.guid].position.x - players[personalGuid].position.x;
                         var y = players[entityUpdate.guid].position.y - players[personalGuid].position.y;
                         double distance = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2));
@@ -99,7 +99,6 @@ namespace ETbot {
                             }
                         }
                     }
-                    
                     break;
                 #endregion
                 case 2:
@@ -120,25 +119,13 @@ namespace ETbot {
                                 HP = players[personalGuid].HP,
                             };
 
-
                             life.Write(writer);
                             if (players[personalGuid].HP <= 0) {
                                 life.HP = 1623f;
                                 life.Write(writer);
                             }
                         }
-                        //if (hit.target == maloxGuid) {
-                        //var heal = new Hit {
-                        //    attacker = personalGuid,
-                        //    target = maloxGuid,
-                        //    damage = -1 * hit.damage,
-                        //};
-                        //heal.Write(writer);
-                        //}
-
                     }
-                    //var size = reader.ReadInt32();
-                    //var compressed = reader.ReadBytes(size);
                     break;
                 #endregion
                 case 5:
@@ -415,9 +402,6 @@ namespace ETbot {
                     playerstats.Write(writer);
                     stopWatch.Start();
                     players.Add(personalGuid, playerstats);
-
-                    //AntiTimeOut(new EntityUpdate());
-                    
                     break;
                 #endregion
                 case 17: //serving sending the right version if yours is wrong
@@ -433,7 +417,6 @@ namespace ETbot {
                 default:
                     Console.WriteLine(string.Format("unknown packet id: {0}", packetid));
                     break;
-
             }
         }
     }   
